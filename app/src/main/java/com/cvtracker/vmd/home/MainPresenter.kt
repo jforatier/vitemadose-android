@@ -49,7 +49,7 @@ class MainPresenter(override val view: MainContract.View) : AbstractCenterPresen
                     ).let {
                         val list = mutableListOf<DisplayItem>()
 
-                        fun prepareCenters(centers: MutableList<DisplayItem.Center>, available: Boolean): List<DisplayItem.Center> {
+                        fun prepareCenters(centers: MutableList<DisplayItem.Center>): List<DisplayItem.Center> {
                             /** Set up distance when city search **/
                             if (isCitySearch) {
                                 centers.onEach { it.calculateDistance(entry as SearchEntry.City) }
@@ -63,7 +63,6 @@ class MainPresenter(override val view: MainContract.View) : AbstractCenterPresen
                             /** Sort results **/
                             centers.sortWith(filter.comparator)
                             centers.onEach { center ->
-                                center.available = available
                                 center.bookmark = centersBookmark
                                     .firstOrNull { center.id == it.centerId }?.bookmark
                                     ?: Bookmark.NONE
@@ -74,7 +73,7 @@ class MainPresenter(override val view: MainContract.View) : AbstractCenterPresen
                         /** Add header to show last updated view **/
                         list.add(DisplayItem.LastUpdated(it.lastUpdated))
 
-                        val preparedAvailableCenters = prepareCenters(it.availableCenters, true)
+                        val preparedAvailableCenters = prepareCenters(it.availableCenters)
                         if (preparedAvailableCenters.isNotEmpty()) {
                             /** Add header when available centers **/
                             list.add(
@@ -86,7 +85,7 @@ class MainPresenter(override val view: MainContract.View) : AbstractCenterPresen
                             list.addAll(preparedAvailableCenters)
                         }
 
-                        val preparedUnavailableCenters = prepareCenters(it.unavailableCenters, false)
+                        val preparedUnavailableCenters = prepareCenters(it.unavailableCenters)
                         if (preparedUnavailableCenters.isNotEmpty()) {
                             /** Add the header with unavailable centers **/
                             list.add(DisplayItem.UnavailableCenterHeader(preparedAvailableCenters.isNotEmpty()))

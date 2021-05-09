@@ -2,6 +2,7 @@ package com.cvtracker.vmd.data
 
 import android.location.Location
 import android.telephony.PhoneNumberUtils
+import android.text.format.DateFormat
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -26,16 +27,20 @@ sealed class DisplayItem {
         val nextSlot: Date?,
         @SerializedName("appointment_count")
         val appointmentCount: Int,
+        @SerializedName("appointment_by_phone_only")
+        val appointmentByPhoneOnly: Boolean,
         @SerializedName("type")
         val type: String?,
         @SerializedName("internal_id")
         val id: String?,
         @SerializedName("vaccine_type")
         val vaccineType: List<String>?,
-        var available: Boolean = false,
         var distance: Float? = null,
         var bookmark: Bookmark = Bookmark.NONE
     ) : DisplayItem() {
+
+        val available: Boolean
+            get() = (appointmentByPhoneOnly && !metadata?.phoneNumber.isNullOrBlank()) || appointmentCount > 0
 
         val platformEnum: Plateform?
             get() = platform?.let { Plateform.fromId(it) }
@@ -46,6 +51,13 @@ sealed class DisplayItem {
                 "drugstore" -> "Pharmacie"
                 "general-practitioner" -> "Médecin généraliste"
                 else -> null
+            }
+
+        val formattedNextSlot: String?
+            get() = try {
+                DateFormat.format("EEEE d MMM à k'h'mm", nextSlot).toString().capitalize(Locale.FRANCE)
+            } catch (e: Exception) {
+                ""
             }
 
         val formattedAddress: String?
