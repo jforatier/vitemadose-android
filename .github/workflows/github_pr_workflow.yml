@@ -42,7 +42,13 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Build
+    - name: Run linter 👀
+      run: ./gradlew lint
+
+    - name: Run tests 🧪
+      run: ./gradlew test
+
+    - name: Build 🛠️
       uses: xdtianyu/actions-android-ci@master
       with:
         args: '"
